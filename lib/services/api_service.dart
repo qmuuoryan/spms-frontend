@@ -6,21 +6,51 @@ class ApiService {
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/api/login/');
-    final response = await http.post(
-      url,
-      body: {
-        'username': email,
-        'password': password,
-      },
-    );
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({'username': email, 'password': password});
+
+    final response = await http.post(url, headers: headers, body: body);
 
     print("Status Code: ${response.statusCode}");
     print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
+    } else if (response.statusCode == 400 || response.statusCode == 401) {
+      final error = json.decode(response.body);
+      throw Exception(error['detail'] ?? 'Invalid credentials');
     } else {
-      throw Exception('Login failed: ${response.body}');
+      throw Exception('Unexpected error: ${response.statusCode}');
+    }
+  }
+
+  static Future<Map<String, dynamic>> register({
+    required String username,
+    required String email,
+    required String password,
+    required String role, // student, supervisor, etc.
+  }) async {
+    final url = Uri.parse('$baseUrl/api/register/');
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'username': username,
+      'email': email,
+      'password': password,
+      'role': role,
+    });
+
+    final response = await http.post(url, headers: headers, body: body);
+
+    print("Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      final error = json.decode(response.body);
+      throw Exception(error['detail'] ?? 'Registration failed');
     }
   }
 }
