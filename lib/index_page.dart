@@ -8,7 +8,7 @@ class IndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('SPMS Portal')),
+      appBar: AppBar(title: const Text('Senior Project Management System')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
