@@ -43,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             DropdownButton<String>(
               value: selectedRole,
-              items: ['student', 'supervisor'].map((role) {
+              items: ['student', 'supervisor', 'Lecturer', 'admin'].map((role) {
                 return DropdownMenuItem(
                   value: role,
                   child: Text(role.toUpperCase()),
@@ -51,6 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               }).toList(),
               onChanged: (value) => setState(() => selectedRole = value!),
             ),
+            
             BaseRegisterForm(
               emailController: emailController,
               passwordController: passwordController,
