@@ -17,12 +17,15 @@ class _LoginScreenState extends State<LoginScreen> {
     print("Login button pressed");
     print("Email: ${emailController.text}");
     print("Password: ${passwordController.text}");
+    
+
 
     try {
       final result = await ApiService.login(
         emailController.text,
         passwordController.text,
       );
+      print("Login Response: $result");
 
       final token = result['token'];
       final role = result['role'];
@@ -33,9 +36,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (role == 'student') {
         Navigator.pushReplacementNamed(context, '/student_home');
-      } else if (role == 'supervisor') {
+      } 
+      else if (role == 'supervisor') {
         Navigator.pushReplacementNamed(context, '/supervisor_home');
-      } else {
+      } 
+      else if (role == 'lecturer'){
+        Navigator.pushReplacementNamed(context, '/lecturer_home');
+      }
+      else if (role == 'admin'){
+        Navigator.pushReplacementNamed(context, '/admin_home');
+      }
+      else {
         setState(() => errorMessage = "Unknown role: $role");
       }
     } catch (e) {
