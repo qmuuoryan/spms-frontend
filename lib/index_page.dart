@@ -8,7 +8,20 @@ class IndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Senior Project Management System')),
+      appBar: AppBar(
+        title: const Text('Senior Project Management System', style: TextStyle(fontweight: FontWeight: Fontweight.bold))),
+
+         actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+            );
+          },
+          child: const Text("Login", style: TextStyle(color: colors.white)),   
+        )
+      ],
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
