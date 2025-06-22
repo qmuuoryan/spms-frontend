@@ -3,6 +3,8 @@ import '../widgets/base_register_form.dart';
 import '../services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+  
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
