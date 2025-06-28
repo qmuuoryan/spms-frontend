@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'index_page.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/student_dashboard.dart';
 import 'screens/supervisor_dashboard.dart';
 import 'screens/lecturer_dashboard.dart';
-import 'screens/admin_dashboard.dart';
+import 'index_page.dart';
 
 void main() {
   runApp(const SPMSApp());
@@ -19,15 +18,28 @@ class SPMSApp extends StatelessWidget {
     return MaterialApp(
       title: 'SPMS',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.teal),
-      home: const IndexPage(),
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        scaffoldBackgroundColor: Colors.grey[100],
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.black),
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      initialRoute: '/',
       routes: {
-        '/login': (_) => const LoginScreen(),
-        '/register': (_) => const RegisterScreen(),
-        '/student_home': (_) => const StudentDashboard(),
-        '/supervisor_home': (_) => const SupervisorDashboard(),
-        '/lecturer_home': (_) => const LecturerDashboard(),
-        '/admin_home': (_) => const AdminDashboard(),
+        '/': (context) => const IndexPage(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/student_home': (context) => const Scaffold(body: Center(child: Text("Student Dashboard Placeholder"))),
+        '/supervisor_home': (context) => const Scaffold(body: Center(child: Text("Supervisor Dashboard Placeholder"))),
+        '/lecturer_home': (context) => const Scaffold(body: Center(child: Text("Lecturer Dashboard Placeholder"))),
       },
     );
   }

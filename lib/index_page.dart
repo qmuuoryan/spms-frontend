@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'widgets/navbar.dart';
+import 'widgets/footer.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -8,49 +10,66 @@ class IndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("SPMS", style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
-            child: const Text("Login", style: TextStyle(color: Colors.black)),
+      appBar: const NavBar(),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE0F7FA), Color(0xFFB2EBF2)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const RegisterScreen()),
-              );
-            },
-            child: const Text("Register", style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                "Senior Project Management System (SPMS)",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+        ),
+        child: ListView(
+          children: [
+            const SizedBox(height: 20),
+            Center(
+              child: Image.asset(
+                'assets/images/spms_banner.png',
+                height: 200,
+                fit: BoxFit.contain,
               ),
-              SizedBox(height: 20),
-              Text(
-                "SPMS is a comprehensive platform to manage student final-year projects, "
-                "including topic submission, supervisor allocation, proposal review, and progress tracking.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, height: 1.5),
+            ),
+            const SizedBox(height: 30),
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.teal.shade100,
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Column(
+                  children: [
+                    Text(
+                      "Senior Project Management System (SPMS)",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.teal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "SPMS is a comprehensive platform for managing final-year student projects. "
+                      "It supports topic submission, supervisor assignment, proposal reviews, and real-time progress tracking.",
+                      style: TextStyle(fontSize: 16, height: 1.6),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 60),
+            const Center(child: Footer()),
+          ],
         ),
       ),
     );

@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 class LecturerDashboard extends StatelessWidget {
-  const LecturerDashboard({super.key});
+  final String token;
+
+  const LecturerDashboard({super.key, required this.token});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Lecturer Dashboard")),
-      body: Center(child: Text("Welcome Lecturer!")),
+      appBar: AppBar(title: const Text("Lecturer Dashboard")),
+      body: const Center(
+        child: Text(
+          "Welcome to the Lecturer Dashboard!",
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
     );
   }
 }

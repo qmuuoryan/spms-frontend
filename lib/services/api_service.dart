@@ -6,12 +6,10 @@ class ApiService {
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/api/login/');
-
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'username': email, 'password': password});
 
     final response = await http.post(url, headers: headers, body: body);
-
     print("Status Code: ${response.statusCode}");
     print("Response Body: ${response.body}");
 
@@ -29,10 +27,9 @@ class ApiService {
     required String username,
     required String email,
     required String password,
-    required String role, // student, supervisor, etc.
+    required String role, 
   }) async {
     final url = Uri.parse('$baseUrl/api/register/');
-
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'username': username,
@@ -42,7 +39,6 @@ class ApiService {
     });
 
     final response = await http.post(url, headers: headers, body: body);
-
     print("Status Code: ${response.statusCode}");
     print("Response Body: ${response.body}");
 
@@ -51,6 +47,27 @@ class ApiService {
     } else {
       final error = json.decode(response.body);
       throw Exception(error['detail'] ?? 'Registration failed');
+    }
+  }
+
+  
+  static Future<Map<String, dynamic>> getStudentDashboard(String token) async {
+    final url = Uri.parse('$baseUrl/api/student/dashboard/');
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    print("Dashboard Status: ${response.statusCode}");
+    print("Dashboard Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load student dashboard');
     }
   }
 }

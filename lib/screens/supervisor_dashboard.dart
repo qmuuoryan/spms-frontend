@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 class SupervisorDashboard extends StatelessWidget {
-  const SupervisorDashboard({super.key});
+  final String token;
+
+  const SupervisorDashboard({super.key, required this.token});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Supervisor Dashboard")),
-      body: Center(child: Text("Welcome Supervisor!")),
+      appBar: AppBar(title: const Text("Supervisor Dashboard")),
+      body: const Center(
+        child: Text(
+          "Welcome to the Supervisor Dashboard!",
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
     );
   }
 }

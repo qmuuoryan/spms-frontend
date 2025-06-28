@@ -1,71 +1,68 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'student_dashboard.dart';
+import 'supervisor_dashboard.dart';
+import 'lecturer_dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key}); 
+  const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  String? errorMessage;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
-  void handleLogin() async {
-    print("Login button pressed");
-    print("Email: ${emailController.text}");
-    print("Password: ${passwordController.text}");
-    
-
-
+  void loginUser() async {
+    setState(() => isLoading = true);
     try {
-      final result = await ApiService.login(
-        emailController.text,
-        passwordController.text,
+      final response = await ApiService.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
       );
-      print("Login Response: $result");
 
-      final token = result['token'];
-      final role = result['role'];
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful! Role: $role')),
-      );
+      final token = response['token'];
+      final role = response['role'];
 
       if (role == 'student') {
-        Navigator.pushReplacementNamed(context, '/student_home');
-      } 
-      else if (role == 'supervisor') {
-        Navigator.pushReplacementNamed(context, '/supervisor_home');
-      } 
-      else if (role == 'lecturer'){
-        Navigator.pushReplacementNamed(context, '/lecturer_home');
-      }
-      else if (role == 'admin'){
-        Navigator.pushReplacementNamed(context, '/admin_home');
-      }
-      else {
-        setState(() => errorMessage = "Unknown role: $role");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => StudentDashboard(token: token)),
+        );
+      } else if (role == 'supervisor') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => SupervisorDashboard(token: token)),
+        );
+      } else if (role == 'lecturer') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LecturerDashboard(token: token)),
+        );
       }
     } catch (e) {
-      print("Login failed: $e");
-      setState(() => errorMessage = e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("SPMS Login")),
+      appBar: AppBar(title: const Text("Login")),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(labelText: "Email"),
+              decoration: const InputDecoration(labelText: "Username"),
             ),
             TextField(
               controller: passwordController,
@@ -74,17 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: handleLogin,
-              child: const Text("Login"),
+              onPressed: isLoading ? null : loginUser,
+              child: isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Login"),
             ),
-            if (errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                  errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
           ],
         ),
       ),

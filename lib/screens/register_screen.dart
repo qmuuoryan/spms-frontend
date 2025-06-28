@@ -45,7 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             DropdownButton<String>(
               value: selectedRole,
-              items: ['student', 'supervisor', 'Lecturer', 'admin'].map((role) {
+              items: ['student', 'supervisor', 'lecturer', 'admin'].map((role) {
                 return DropdownMenuItem(
                   value: role,
                   child: Text(role.toUpperCase()),
