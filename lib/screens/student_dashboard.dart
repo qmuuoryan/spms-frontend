@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'submit_topic_screen.dart';
+
 
 class StudentDashboard extends StatefulWidget {
   final String token;
@@ -58,10 +60,17 @@ class _StudentDashboardState extends State<StudentDashboard> {
                   Card(
                     child: ListTile(
                       title: const Text("Project Topic"),
-                      subtitle: const Text("You haven’t submitted a topic yet."),
+                      subtitle: const Text("You have not submitted a topic yet."),
                       trailing: const Icon(Icons.arrow_forward_ios),
+
+
                       onTap: () {
-                        Navigator.pushNamed(context, '/submit_topic');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SubmitTopicScreen(token: widget.token),
+                          ),
+                        );
                       },
                     ),
                   ),
