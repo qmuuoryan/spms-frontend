@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../models/student_dashboard_model.dart';
+import 'dart:io';
+import 'package:path/path.dart';
 
 class ApiService {
   static const String baseUrl = 'http://127.0.0.1:8000';
@@ -53,26 +56,26 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>> getStudentDashboard(String token) async {
+  static Future<StudentDashboardData> getStudentDashboard(String token) async {
     final url = Uri.parse('$baseUrl/api/dashboard/student/');
     final response = await http.get(
       url,
       headers: {
         'Authorization': 'Token $token',
         'Content-Type': 'application/json',
-      },
+     },
     );
 
     print("Dashboard Status: ${response.statusCode}");
     print("Dashboard Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      final data = json.decode(response.body);
+      return StudentDashboardData.fromJson(data);
     } else {
       throw Exception('Failed to load student dashboard');
     }
   }
-
   
   static Future<void> submitProjectTopic(String token, String title, String description) async {
     final url = Uri.parse('$baseUrl/api/dashboard/student/submit-topic/');
@@ -87,6 +90,95 @@ class ApiService {
     if (response.statusCode != 201 && response.statusCode != 200) {
       final error = json.decode(response.body);
       throw Exception(error['detail'] ?? 'Submission failed');
+    }
+  }
+
+  static Future<void> uploadProposal({
+   required String token,
+   required int projectId,
+   required File file,
+  }) async {
+   final url = Uri.parse('$baseUrl/api/proposals/');
+   final request = http.MultipartRequest('POST', url)
+     ..headers['Authorization'] = 'Token $token'
+     ..fields['project'] = projectId.toString()
+     ..files.add(await http.MultipartFile.fromPath('file', file.path));
+
+   final streamedResponse = await request.send();
+   final response = await http.Response.fromStream(streamedResponse);
+
+   if (response.statusCode != 201 && response.statusCode != 200) {
+     final error = json.decode(response.body);
+     throw Exception(error['detail'] ?? 'Proposal upload failed');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getSubmittedTopics(String token) async {
+    final url = Uri.parse('$baseUrl/api/lecturer/submitted-topics/');
+    final response = await http.get(url, headers: {
+      'Authorization': 'Token $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => item as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load submitted topics');
+    }
+  }
+
+  static Future<void> approveTopic(String token, int projectId) async {
+    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/approve/');
+    final response = await http.post(url, headers: {
+      'Authorization': 'Token $token',
+    });
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to approve topic');
+    }
+  }
+
+  static Future<void> rejectTopic(String token, int projectId) async {
+    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/reject/');
+    final response = await http.post(url, headers: {
+      'Authorization': 'Token $token',
+    });
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to reject topic');
+    }
+  }
+
+  static Future<void> assignSupervisor(String token, int projectId, int supervisorId) async {
+    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/assign-supervisor/');
+    final response = await http.post(
+     url,
+      headers: {
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json',
+     },
+      body: jsonEncode({'supervisor_id': supervisorId}),
+    );
+
+    if (response.statusCode != 200) {
+      final data = json.decode(response.body);
+      throw Exception(data['error'] ?? 'Failed to assign supervisor');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getSupervisors(String token) async {
+    final url = Uri.parse('$baseUrl/api/lecturer/supervisors/');
+    final response = await http.get(url, headers: {
+      'Authorization': 'Token $token',
+      'Content-Type': 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      final List data = json.decode(response.body);
+      return data.cast<Map<String, dynamic>>();
+    } else {
+      throw Exception('Failed to load supervisors');
     }
   }
 }
