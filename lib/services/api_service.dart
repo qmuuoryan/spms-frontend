@@ -181,4 +181,18 @@ class ApiService {
       throw Exception('Failed to load supervisors');
     }
   }
+
+  static Future<List<dynamic>> getAssignedProjects(String token) async {
+    final url = Uri.parse('$baseUrl/api/supervisor/assigned-projects/');
+    final response = await http.get(url, headers: {
+      'Authorization': 'Token $token',
+      'Content-Type': 'application/json',
+   });
+
+   if (response.statusCode == 200) {
+    return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load assigned projects');
+    }
+  }
 }
