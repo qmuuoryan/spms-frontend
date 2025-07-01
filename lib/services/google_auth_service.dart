@@ -3,8 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class GoogleAuthService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api/'; // Android emulator
-  // static const String baseUrl = 'http://localhost:8000/api/auth'; // iOS simulator
+  static const String baseUrl = 'http://127.0.0.1:8000';
   
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: [
@@ -30,7 +29,7 @@ class GoogleAuthService {
 
       // Send the access token to your Django backend
       final response = await http.post(
-        Uri.parse('$baseUrl/google/'),
+        Uri.parse('$baseUrl/api/google/'),
         headers: {
           'Content-Type': 'application/json',
         },
