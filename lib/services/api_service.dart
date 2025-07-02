@@ -181,4 +181,61 @@ class ApiService {
       throw Exception('Failed to load supervisors');
     }
   }
+
+  static Future<List<dynamic>> getAssignedProjects(String token) async {
+    final url = Uri.parse('$baseUrl/api/supervisor/assigned-projects/');
+    final response = await http.get(url, headers: {
+      'Authorization': 'Token $token',
+      'Content-Type': 'application/json',
+    });
+
+    print('Assigned Projects Status: ${response.statusCode}');
+    print('Assigned Projects Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load assigned projects');
+    }
+  }
+
+
+  static Future<List<dynamic>> getSupervisorProposals(String token) async {
+  final url = Uri.parse('$baseUrl/api/supervisor/proposals/');
+  final response = await http.get(url, headers: {
+    'Authorization': 'Token $token',
+    'Content-Type': 'application/json',
+  });
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception("Failed to load proposals");
+  }
+}
+
+static Future<void> reviewProposal({
+  required String token,
+  required int proposalId,
+  required String status,
+  required String feedback,
+}) async {
+  final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/review/');
+  final response = await http.post(
+    url,
+    headers: {
+      'Authorization': 'Token $token',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'status': status, 'feedback': feedback}),
+  );
+
+  if (response.statusCode != 200) {
+    final error = json.decode(response.body);
+    throw Exception(error['detail'] ?? 'Review failed');
+  }
+}
+
+
+
 }
