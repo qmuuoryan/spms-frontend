@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:spms_frontend/screens/lecturer_dashboard.dart';
+import 'package:spms_frontend/screens/student_dashboard.dart';
+import 'package:spms_frontend/screens/supervisor_dashboard.dart';
+import 'package:spms_frontend/services/google_auth_service.dart';
 import '../widgets/base_register_form.dart';
 import '../services/api_service.dart';
 
@@ -15,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   final fullNameController = TextEditingController();
   String selectedRole = 'student';
   String? error;
+  bool isGoogleLoading = false;
   
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -74,6 +79,91 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
     } catch (e) {
       setState(() => error = e.toString());
     }
+  }
+
+  void signInWithGoogle() async {
+    setState(() => isGoogleLoading = true);
+    
+    try {
+      final result = await GoogleAuthService.signInWithGoogle();
+      
+      if (result['success']) {
+        final token = result['token'];
+        final role = result['role'];
+        final isNewUser = result['isNewUser'];
+        
+        if (isNewUser) {
+          _showSuccessSnackBar('Welcome! Account created successfully');
+        } else {
+          _showSuccessSnackBar('Welcome back!');
+        }
+        
+        _navigateToRoleDashboard(role, token);
+      } else {
+        _showErrorSnackBar(result['error']);
+      }
+    } catch (e) {
+      _showErrorSnackBar('Google sign-in failed: ${e.toString()}');
+    } finally {
+      setState(() => isGoogleLoading = false);
+    }
+  }
+
+  void _navigateToRoleDashboard(String role, String token) {
+    Widget dashboard;
+    
+    switch (role) {
+      case 'student':
+        dashboard = StudentDashboard(token: token);
+        break;
+      case 'supervisor':
+        dashboard = SupervisorDashboard(token: token);
+        break;
+      case 'lecturer':
+        dashboard = LecturerDashboard(token: token);
+        break;
+      default:
+        dashboard = StudentDashboard(token: token);
+    }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => dashboard),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -237,7 +327,63 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
           
           const SizedBox(height: 24),
           
-          
+          // Divider
+          Row(
+            children: [
+              Expanded(child: Divider(color: Colors.grey.shade300)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  "or",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
+              Expanded(child: Divider(color: Colors.grey.shade300)),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Google Sign-In Button
+          ElevatedButton.icon(
+            onPressed: isGoogleLoading ? null : signInWithGoogle,
+            icon: Image.asset(
+              'assets/icons/g.png', // Make sure this file exists in your assets
+              height: 24,
+              width: 24,
+            ),
+            label: isGoogleLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Text(
+                    "Sign in with Google",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+              shadowColor: Colors.black45,
+            ),
+          ),
+
+
+          const SizedBox(height: 24),
+
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
