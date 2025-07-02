@@ -251,9 +251,9 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF667eea),
-              Color(0xFF764ba2),
-              Color(0xFF89216B),
+              Color(0xFF004D40),
+              Color(0xFF00695C),
+              Color(0xFF26A69A)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -346,7 +346,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
                                         gradient: LinearGradient(
                                           colors: hasSelectedFile
                                               ? [Colors.green[400]!, Colors.green[600]!]
-                                              : [const Color(0xFF667eea), const Color(0xFF764ba2)],
+                                              : [const Color(0xFF00695C), const Color(0xFF004D40)],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                         ),
@@ -433,7 +433,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
       label: Text(!hasSelectedFile ? "Choose File" : "Change File"),
       style: ElevatedButton.styleFrom(
         backgroundColor: !hasSelectedFile 
-            ? const Color(0xFF667eea) 
+            ? const Color(0xFF00695C) 
             : Colors.grey[600],
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
@@ -441,7 +441,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
           borderRadius: BorderRadius.circular(16),
         ),
         elevation: 8,
-        shadowColor: const Color(0xFF667eea).withOpacity(0.3),
+        shadowColor: const Color(0xFF00695C).withOpacity(0.3),
       ),
     );
   }
