@@ -286,6 +286,42 @@ class ApiService {
     }
   }
 
+
+  static Future<void> approveProposal(String token, int proposalId, String feedback) async {
+    final url = Uri.parse('$baseUrl/api/proposals/$proposalId/approve/');
+    final response = await http.post(
+     url,
+      headers: {
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'feedback': feedback}),
+    );
+
+    if (response.statusCode != 200) {
+      final error = json.decode(response.body);
+      throw Exception(error['detail'] ?? 'Failed to approve proposal');
+    }
+  }
+
+  static Future<void> rejectProposal(String token, int proposalId, String feedback) async {
+    final url = Uri.parse('$baseUrl/api/proposals/$proposalId/reject/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Token $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'feedback': feedback}),
+    );
+
+    if (response.statusCode != 200) {
+      final error = json.decode(response.body);
+      throw Exception(error['detail'] ?? 'Failed to reject proposal');
+    }
+  }
+
+
   static Future<List<Map<String, dynamic>>> getProposalsForProject(
       String token, int projectId) async {
     final url = Uri.parse('$baseUrl/api/projects/$projectId/proposals/');
