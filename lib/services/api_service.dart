@@ -101,7 +101,7 @@ class ApiService {
     required String token,
     required int projectId,
     required File file,
-  }) async {
+    }) async {
     if (kIsWeb) {
       throw Exception('Use uploadProposalWeb for web platform');
     }
@@ -112,34 +112,34 @@ class ApiService {
         Uri.parse('$baseUrl/api/projects/$projectId/proposals'),
       );
 
-      // Add headers
+      
       request.headers['Authorization'] = 'Token $token';
       request.headers['Content-Type'] = 'multipart/form-data';
 
-      // Add the file
+      
       var multipartFile = await http.MultipartFile.fromPath(
-        'proposal_file', // field name expected by your API
+        'proposal_file', 
         file.path,
         filename: file.path.split('/').last,
       );
       
       request.files.add(multipartFile);
 
-      // Add other form fields if needed
+      
       request.fields['project_id'] = projectId.toString();
 
-      // Send the request
+      
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Success
+      
         print('Upload successful');
       } else {
-        throw Exception('Upload failed: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      throw Exception('Upload error: $e');
+          throw Exception('Upload failed: ${response.statusCode} - ${response.body}');
+        }
+      }   catch (e) {
+        throw Exception('Upload error: $e');
     }
   }
 

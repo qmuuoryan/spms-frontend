@@ -265,7 +265,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
           Icon(icon, size: 18, color: Colors.grey),
           const SizedBox(width: 8),
           Text(
-            "\$label:",
+            "$label:",
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
