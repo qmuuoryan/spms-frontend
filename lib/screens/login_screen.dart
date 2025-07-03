@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spms_frontend/services/google_auth_service.dart';
 import '../services/api_service.dart';
 import 'student_dashboard.dart';
 import 'supervisor_dashboard.dart';
@@ -16,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   final TextEditingController passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+  bool isGoogleLoading = false;
   bool _obscurePassword = true;
   
   late AnimationController _animationController;
@@ -70,40 +72,97 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       final token = response['token'];
       final role = response['role'];
 
-      if (role == 'student') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => StudentDashboard(token: token)),
-        );
-      } else if (role == 'supervisor') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => SupervisorDashboard(token: token)),
-        );
-      } else if (role == 'lecturer') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => LecturerDashboard(token: token)),
-        );
-      }
+      _navigateToRoleDashboard(role, token);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              Expanded(child: Text(e.toString())),
-            ],
-          ),
-          backgroundColor: Colors.red.shade600,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        ),
-      );
+      _showErrorSnackBar(e.toString());
     } finally {
       setState(() => isLoading = false);
     }
+  }
+
+  void signInWithGoogle() async {
+    setState(() => isGoogleLoading = true);
+    
+    try {
+      final result = await GoogleAuthService.signInWithGoogle();
+      
+      if (result['success']) {
+        final token = result['token'];
+        final role = result['role'];
+        final isNewUser = result['isNewUser'];
+        
+        if (isNewUser) {
+          _showSuccessSnackBar('Welcome! Account created successfully');
+        } else {
+          _showSuccessSnackBar('Welcome back!');
+        }
+        
+        _navigateToRoleDashboard(role, token);
+      } else {
+        _showErrorSnackBar(result['error']);
+      }
+    } catch (e) {
+      _showErrorSnackBar('Google sign-in failed: ${e.toString()}');
+    } finally {
+      setState(() => isGoogleLoading = false);
+    }
+  }
+
+  void _navigateToRoleDashboard(String role, String token) {
+    Widget dashboard;
+    
+    switch (role) {
+      case 'student':
+        dashboard = StudentDashboard(token: token);
+        break;
+      case 'supervisor':
+        dashboard = SupervisorDashboard(token: token);
+        break;
+      case 'lecturer':
+        dashboard = LecturerDashboard(token: token);
+        break;
+      default:
+        dashboard = StudentDashboard(token: token);
+    }
+    
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => dashboard),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
 
   @override
@@ -352,6 +411,44 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               ],
             ),
             
+            const SizedBox(height: 16),
+
+            // Google Sign-In Button
+            ElevatedButton.icon(
+              onPressed: isGoogleLoading ? null : signInWithGoogle,
+              icon: Image.asset(
+                'assets/icons/g.png', // Make sure this file exists in your assets
+                height: 24,
+                width: 24,
+              ),
+              label: isGoogleLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      "Sign in with Google",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+                shadowColor: Colors.black45,
+              ),
+            ),
+
             const SizedBox(height: 16),
             
             // Register Link

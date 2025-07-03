@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/student_dashboard.dart';
-import 'screens/supervisor_dashboard.dart';
-import 'screens/lecturer_dashboard.dart';
 import 'index_page.dart';
 
 void main() {

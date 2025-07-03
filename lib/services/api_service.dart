@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/student_dashboard_model.dart';
 import 'dart:io';
@@ -94,22 +98,91 @@ class ApiService {
   }
 
   static Future<void> uploadProposal({
-   required String token,
-   required int projectId,
-   required File file,
+    required String token,
+    required int projectId,
+    required File file,
   }) async {
-   final url = Uri.parse('$baseUrl/api/proposals/');
-   final request = http.MultipartRequest('POST', url)
-     ..headers['Authorization'] = 'Token $token'
-     ..fields['project'] = projectId.toString()
-     ..files.add(await http.MultipartFile.fromPath('file', file.path));
+    if (kIsWeb) {
+      throw Exception('Use uploadProposalWeb for web platform');
+    }
 
-   final streamedResponse = await request.send();
-   final response = await http.Response.fromStream(streamedResponse);
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/api/projects/$projectId/proposals'),
+      );
 
-   if (response.statusCode != 201 && response.statusCode != 200) {
-     final error = json.decode(response.body);
-     throw Exception(error['detail'] ?? 'Proposal upload failed');
+      // Add headers
+      request.headers['Authorization'] = 'Token $token';
+      request.headers['Content-Type'] = 'multipart/form-data';
+
+      // Add the file
+      var multipartFile = await http.MultipartFile.fromPath(
+        'proposal_file', // field name expected by your API
+        file.path,
+        filename: file.path.split('/').last,
+      );
+      
+      request.files.add(multipartFile);
+
+      // Add other form fields if needed
+      request.fields['project_id'] = projectId.toString();
+
+      // Send the request
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Success
+        print('Upload successful');
+      } else {
+        throw Exception('Upload failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Upload error: $e');
+    }
+  }
+
+  static Future<void> uploadProposalWeb({
+    required String token,
+    required int projectId,
+    required Uint8List fileBytes,
+    required String fileName,
+  }) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/api/projects/$projectId/proposals'),
+      );
+
+      
+      request.headers['Authorization'] = 'Token $token';
+      request.headers['Content-Type'] = 'multipart/form-data';
+
+      
+      var multipartFile = http.MultipartFile.fromBytes(
+        'proposal_file', 
+        fileBytes,
+        filename: fileName,
+      );
+      
+      request.files.add(multipartFile);
+
+      
+      request.fields['project_id'] = projectId.toString();
+
+      
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        
+        print('Upload successful');
+      } else {
+        throw Exception('Upload failed: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Upload error: $e');
     }
   }
 
@@ -189,53 +262,44 @@ class ApiService {
       'Content-Type': 'application/json',
     });
 
-    print('Assigned Projects Status: ${response.statusCode}');
-    print('Assigned Projects Body: ${response.body}');
-
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+    return json.decode(response.body);
     } else {
       throw Exception('Failed to load assigned projects');
     }
   }
 
 
-  static Future<List<dynamic>> getSupervisorProposals(String token) async {
-  final url = Uri.parse('$baseUrl/api/supervisor/proposals/');
-  final response = await http.get(url, headers: {
-    'Authorization': 'Token $token',
-    'Content-Type': 'application/json',
-  });
+  static Future<void> updateProposalStatus({
+    required String token,
+    required int proposalId,
+    required String action,
+  }) async {
+    final url = Uri.parse('$baseUrl/api/supervisor/proposal/$proposalId/$action/');
+    final response = await http.post(url, headers: {
+      'Authorization': 'Token $token',
+    });
 
-  if (response.statusCode == 200) {
-    return json.decode(response.body);
-  } else {
-    throw Exception("Failed to load proposals");
+    if (response.statusCode != 200) {
+      final data = json.decode(response.body);
+      throw Exception(data['detail'] ?? 'Failed to $action proposal');
+    }
   }
-}
 
-static Future<void> reviewProposal({
-  required String token,
-  required int proposalId,
-  required String status,
-  required String feedback,
-}) async {
-  final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/review/');
-  final response = await http.post(
-    url,
-    headers: {
+  static Future<List<Map<String, dynamic>>> getProposalsForProject(
+      String token, int projectId) async {
+    final url = Uri.parse('$baseUrl/api/projects/$projectId/proposals/');
+    final response = await http.get(url, headers: {
       'Authorization': 'Token $token',
       'Content-Type': 'application/json',
-    },
-    body: jsonEncode({'status': status, 'feedback': feedback}),
-  );
+    });
 
-  if (response.statusCode != 200) {
-    final error = json.decode(response.body);
-    throw Exception(error['detail'] ?? 'Review failed');
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((item) => item as Map<String, dynamic>).toList();
+    } else {
+      throw Exception('Failed to load proposals for project $projectId');
+    }
   }
-}
-
-
 
 }

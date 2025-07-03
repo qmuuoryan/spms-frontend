@@ -7,7 +7,7 @@ class BaseRegisterForm extends StatelessWidget {
   final String role;
   final Function onSubmit;
 
-  BaseRegisterForm({
+  const BaseRegisterForm({super.key, 
     required this.emailController,
     required this.passwordController,
     required this.fullNameController,
