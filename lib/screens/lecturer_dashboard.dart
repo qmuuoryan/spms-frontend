@@ -1,4 +1,3 @@
-// Redesigned LecturerDashboard to match StudentDashboard style
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
@@ -59,7 +58,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
     } catch (e) {
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: \$e')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
@@ -69,7 +68,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
       await ApiService.approveTopic(widget.token, topicId);
       fetchDashboardData();
     } catch (e) {
-      _showError('Approval failed: \$e');
+      _showError('Approval failed: $e');
     }
   }
 
@@ -78,7 +77,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
       await ApiService.rejectTopic(widget.token, topicId);
       fetchDashboardData();
     } catch (e) {
-      _showError('Rejection failed: \$e');
+      _showError('Rejection failed: $e');
     }
   }
 
@@ -87,7 +86,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
       await ApiService.assignSupervisor(widget.token, topicId, supervisorId);
       fetchDashboardData();
     } catch (e) {
-      _showError('Assignment failed: \$e');
+      _showError('Assignment failed: $e');
     }
   }
 
@@ -110,8 +109,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
         ),
         child: SafeArea(
           child: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: Colors.white))
+              ? const Center(child: CircularProgressIndicator(color: Colors.white))
               : RefreshIndicator(
                   onRefresh: fetchDashboardData,
                   color: Colors.white,
@@ -130,21 +128,13 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
                                   color: Colors.white.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const Icon(
-                                  Icons.dashboard,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
+                                child: const Icon(Icons.dashboard, color: Colors.white, size: 28),
                               ),
                               const SizedBox(width: 16),
                               const Expanded(
                                 child: Text(
                                   "Lecturer Dashboard",
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
+                                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                                 ),
                               ),
                             ],
@@ -152,6 +142,11 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
                           const SizedBox(height: 20),
                           ...topics.map((topic) {
                             final topicId = topic['id'];
+                            final title = topic['title'] ?? '';
+                            final description = topic['description'] ?? '';
+                            final status = topic['status'] ?? 'Unknown';
+                            final studentName = topic['student_name'] ?? 'Unknown';
+
                             return Container(
                               margin: const EdgeInsets.only(bottom: 20),
                               padding: const EdgeInsets.all(20),
@@ -169,19 +164,12 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    topic['title'],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF424242),
-                                    ),
-                                  ),
+                                  Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF424242))),
                                   const SizedBox(height: 8),
-                                  Text(topic['description'], style: const TextStyle(color: Colors.black87)),
+                                  Text(description, style: const TextStyle(color: Colors.black87)),
                                   const SizedBox(height: 8),
-                                  _buildInfoRow('Status', topic['status'], Icons.info_outline),
-                                  _buildInfoRow('Student', topic['student_name'], Icons.person),
+                                  _buildInfoRow('Status', status, Icons.info_outline),
+                                  _buildInfoRow('Student', studentName, Icons.person),
                                   const SizedBox(height: 16),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,7 +204,7 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
                                     items: supervisors.map<DropdownMenuItem<int>>((supervisor) {
                                       return DropdownMenuItem<int>(
                                         value: supervisor['id'],
-                                        child: Text(supervisor['name']),
+                                        child: Text(supervisor['name'] ?? 'Unnamed'),
                                       );
                                     }).toList(),
                                     onChanged: (value) {
@@ -266,21 +254,13 @@ class _LecturerDashboardState extends State<LecturerDashboard> with TickerProvid
           const SizedBox(width: 8),
           Text(
             "$label:",
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey),
           ),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF424242),
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF424242)),
             ),
           ),
         ],

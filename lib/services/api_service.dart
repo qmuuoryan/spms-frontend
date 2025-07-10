@@ -288,7 +288,7 @@ class ApiService {
 
 
   static Future<void> approveProposal(String token, int proposalId, String feedback) async {
-    final url = Uri.parse('$baseUrl/api/proposals/$proposalId/approve/');
+    final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/approve/');
     final response = await http.post(
      url,
       headers: {
@@ -305,7 +305,7 @@ class ApiService {
   }
 
   static Future<void> rejectProposal(String token, int proposalId, String feedback) async {
-    final url = Uri.parse('$baseUrl/api/proposals/$proposalId/reject/');
+    final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/reject/');
     final response = await http.post(
       url,
       headers: {

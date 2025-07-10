@@ -16,6 +16,7 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
   bool isLoading = true;
   List<dynamic> assignedProjects = [];
   final Map<int, TextEditingController> feedbackControllers = {};
+  String supervisorName = '';
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -38,6 +39,7 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
     );
 
     fetchAssignedProjects();
+    fetchSupervisorInfo();
   }
 
   @override
@@ -47,6 +49,26 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
       controller.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> fetchSupervisorInfo() async {
+    try {
+      final data = await ApiService.getSupervisors(widget.token);
+      if (data.isNotEmpty) {
+        setState(() {
+          supervisorName =
+              "${data[0]['first_name'] ?? ''} ${data[0]['last_name'] ?? ''}".trim();
+        });
+      } else {
+        setState(() {
+          supervisorName = 'Supervisor';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        supervisorName = 'Supervisor';
+      });
+    }
   }
 
   Future<void> fetchAssignedProjects() async {
@@ -80,10 +102,35 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
         SnackBar(content: Text(approve ? "Proposal approved." : "Proposal rejected.")),
       );
 
-      fetchAssignedProjects(); // Refresh
+      fetchAssignedProjects(); 
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
+  }
+
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -139,14 +186,68 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
   }
 
   Widget _buildHeader() {
-    return Row(
-      children: const [
-        Icon(Icons.dashboard, color: Colors.white, size: 28),
-        SizedBox(width: 16),
-        Text(
-          "Supervisor Dashboard",
-          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Row(
+              children: [
+                Icon(Icons.dashboard, color: Colors.white, size: 28),
+                SizedBox(width: 16),
+                Text(
+                  "Supervisor Dashboard",
+                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF00695C), Color(0xFF004D40)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: _logout,
+                icon: const Icon(Icons.logout, color: Colors.white, size: 20),
+                label: const Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 8),
+        if (supervisorName.isNotEmpty)
+          Text(
+            "Welcome, $supervisorName",
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
       ],
     );
   }
@@ -165,8 +266,10 @@ class _SupervisorDashboardState extends State<SupervisorDashboard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildProjectDetailRow("Student", project['student_name']),
-          _buildProjectDetailRow("Reg No", project['student_reg_no']),
+          _buildProjectDetailRow(
+              "Student",
+              "${project['student']?['first_name'] ?? ''} ${project['student']?['last_name'] ?? ''}"),
+          _buildProjectDetailRow("Reg No", project['student']?['reg_number'] ?? 'N/A'),
           _buildProjectDetailRow("Title", project['title']),
           _buildProjectDetailRow("Description", project['description']),
           _buildProjectDetailRow("Status", project['status']),
