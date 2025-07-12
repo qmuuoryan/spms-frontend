@@ -22,10 +22,10 @@ class UploadProposalScreen extends StatefulWidget {
 
 class _UploadProposalScreenState extends State<UploadProposalScreen>
     with TickerProviderStateMixin {
-  // Changed from File? to accommodate both web and mobile
-  File? selectedFile; // For mobile/desktop
-  Uint8List? selectedFileBytes; // For web
-  PlatformFile? selectedPlatformFile; // Contains metadata for both platforms
+  
+  File? selectedFile; 
+  Uint8List? selectedFileBytes; 
+  PlatformFile? selectedPlatformFile; 
   
   bool isUploading = false;
   double uploadProgress = 0.0;
@@ -267,7 +267,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
               position: _slideAnimation,
               child: Column(
                 children: [
-                  // Header
+                  
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Row(
@@ -311,7 +311,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
                     ),
                   ),
 
-                  // Main Content
+                  
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.all(16),
@@ -333,7 +333,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Upload Icon/Animation
+                              
                               AnimatedBuilder(
                                 animation: _pulseAnimation,
                                 builder: (context, child) {
@@ -372,7 +372,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
                               
                               const SizedBox(height: 32),
 
-                              // File Selection Section
+                              
                               if (!hasSelectedFile) ...[
                                 const Text(
                                   "Select a proposal file",
@@ -404,7 +404,7 @@ class _UploadProposalScreenState extends State<UploadProposalScreen>
                                 ),
                               ],
 
-                              // Progress Section
+                              
                               if (isUploading) ...[
                                 const SizedBox(height: 32),
                                 _buildProgressSection(),

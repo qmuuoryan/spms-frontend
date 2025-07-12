@@ -404,7 +404,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         _buildProjectDetailRow("Submitted At", project!.submittedAt, Icons.calendar_today),
         const SizedBox(height: 16),
         
-        // Status Badge
+        
         Row(
           children: [
             const Icon(Icons.info_outline, size: 20, color: Colors.grey),
@@ -424,7 +424,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         
         const SizedBox(height: 20),
         
-        // Action Buttons
+        
         if (project!.status.toLowerCase() == 'approved')
           SizedBox(
             width: double.infinity,

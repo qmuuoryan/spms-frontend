@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildHeader() {
     return Column(
       children: [
-        // Back button
+        
         Align(
           alignment: Alignment.topLeft,
           child: Container(
@@ -228,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ),
         ),
         
-        // Logo with glow effect
+        
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         
         const SizedBox(height: 24),
         
-        // Title with animation
+        
         ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
             colors: [Colors.white, Color(0xFFE8EAF6)],
@@ -306,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Form fields
+            
             _buildInputField(
               controller: emailController,
               label: "Username",
@@ -339,7 +339,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             
             const SizedBox(height: 24),
             
-            // Login button
+            
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -388,7 +388,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             
             const SizedBox(height: 16),
             
-            // Forgot password
+            
             TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -409,7 +409,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             
             const SizedBox(height: 16),
             
-            // Divider
+            
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -429,7 +429,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             
             const SizedBox(height: 16),
 
-            // Google sign-in
+            
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -480,7 +480,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
             const SizedBox(height: 20),
             
-            // Sign up link
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

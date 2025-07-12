@@ -126,7 +126,7 @@ class _SubmitTopicScreenState extends State<SubmitTopicScreen> with TickerProvid
 
                     const SizedBox(height: 40),
 
-                    // Form Card
+                    
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(24),

@@ -223,7 +223,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   Widget _buildHeader() {
     return Column(
       children: [
-        // Back button
+        
         Align(
           alignment: Alignment.topLeft,
           child: Container(
@@ -241,7 +241,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
           ),
         ),
         
-        // Logo with glow effect
+       
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -268,7 +268,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         
         const SizedBox(height: 24),
         
-        // Title with animation
+        
         ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
             colors: [Colors.white, Color(0xFFE8EAF6)],
@@ -319,12 +319,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Role selector
+            
             _buildRoleSelector(),
             
             const SizedBox(height: 16),
             
-            // Full Name field
+            
             _buildInputField(
               controller: fullNameController,
               label: "Full Name",
@@ -357,7 +357,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             
             const SizedBox(height: 16),
             
-            // Password field
+            
             _buildInputField(
               controller: passwordController,
               label: "Password",
@@ -376,7 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             
             const SizedBox(height: 24),
             
-            // Register button
+            
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -423,7 +423,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
               ),
             ),
             
-            // Error message
+            
             if (error != null)
               Container(
                 margin: const EdgeInsets.only(top: 16),
@@ -452,7 +452,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             
             const SizedBox(height: 20),
             
-            // Divider
+            
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -472,7 +472,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             
             const SizedBox(height: 20),
             
-            // Google Sign-In Button
+            
             Container(
               height: 50,
               decoration: BoxDecoration(
@@ -536,7 +536,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             
             const SizedBox(height: 24),
             
-            // Login link
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
