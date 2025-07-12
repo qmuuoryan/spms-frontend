@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
     
@@ -41,11 +41,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     ));
     
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
+      begin: const Offset(0, 0.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOutBack,
     ));
     
     _animationController.forward();
@@ -172,39 +172,33 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF00695C),
-              Color(0xFF004D40),
-              Color(0xFF00251A),
+              Color(0xFF667eea),
+              Color(0xFF764ba2),
+              Color(0xFF6B73FF),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                  // Header Section
-                  _buildHeader(),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Login Form
-                  FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: _buildLoginForm(),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildHeader(),
+                    const SizedBox(height: 40),
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: _buildLoginForm(),
+                      ),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 20),
-                  
-                  // Additional Info
-                  _buildFooterInfo(),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -216,12 +210,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget _buildHeader() {
     return Column(
       children: [
-        // Back Button
-        Row(
-          children: [
-            IconButton(
+        // Back button
+        Align(
+          alignment: Alignment.topLeft,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child: IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               style: IconButton.styleFrom(
                 backgroundColor: Colors.white.withOpacity(0.1),
                 shape: RoundedRectangleBorder(
@@ -229,41 +225,48 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 ),
               ),
             ),
-          ],
+          ),
         ),
         
-        const SizedBox(height: 20),
-        
-        // Welcome Section
+        // Logo with glow effect
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
+            gradient: const LinearGradient(
+              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white.withOpacity(0.3),
+                blurRadius: 30,
+                spreadRadius: 5,
+              ),
+            ],
           ),
           child: const Icon(
-            Icons.login,
-            size: 64,
+            Icons.school,
+            size: 50,
             color: Colors.white,
           ),
         ),
         
         const SizedBox(height: 24),
         
+        // Title with animation
         ShaderMask(
           shaderCallback: (bounds) => const LinearGradient(
-            colors: [Colors.white, Color(0xFFB2DFDB)],
+            colors: [Colors.white, Color(0xFFE8EAF6)],
           ).createShader(bounds),
           child: const Text(
             "Welcome Back",
             style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+              fontSize: 36,
+              fontWeight: FontWeight.w700,
               color: Colors.white,
+              letterSpacing: 1.2,
             ),
           ),
         ),
@@ -271,10 +274,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         const SizedBox(height: 8),
         
         Text(
-          "Login to continue managing your projects",
+          "Sign in to continue your journey",
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withOpacity(0.9),
+            fontWeight: FontWeight.w400,
           ),
           textAlign: TextAlign.center,
         ),
@@ -284,15 +288,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   Widget _buildLoginForm() {
     return Container(
-      padding: const EdgeInsets.all(32),
+      width: MediaQuery.of(context).size.width * 0.9,
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
@@ -301,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Username Field
+            // Form fields
             _buildInputField(
               controller: emailController,
               label: "Username",
@@ -314,9 +319,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               },
             ),
             
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             
-            // Password Field
             _buildInputField(
               controller: passwordController,
               label: "Password",
@@ -333,51 +337,60 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               },
             ),
             
-            const SizedBox(height: 32),
-            
-            // Login Button
-            ElevatedButton(
-              onPressed: isLoading ? null : loginUser,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00695C),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 4,
-              ),
-              child: isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.login, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-            
             const SizedBox(height: 24),
             
-            // Forgot Password
+            // Login button
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF667eea).withOpacity(0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: isLoading ? null : loginUser,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Forgot password
             TextButton(
               onPressed: () {
-                // Handle forgot password
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text("Forgot password feature coming soon!"),
@@ -388,7 +401,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               child: const Text(
                 "Forgot Password?",
                 style: TextStyle(
-                  color: Color(0xFF00695C),
+                  color: Color(0xFF667eea),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -403,8 +416,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    "or",
-                    style: TextStyle(color: Colors.grey.shade600),
+                    "OR",
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -413,45 +429,58 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             
             const SizedBox(height: 16),
 
-            // Google Sign-In Button
-            ElevatedButton.icon(
-              onPressed: isGoogleLoading ? null : signInWithGoogle,
-              icon: Image.asset(
-                'assets/icons/g.png', // Make sure this file exists in your assets
-                height: 24,
-                width: 24,
+            // Google sign-in
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-              label: isGoogleLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : const Text(
-                      "Sign in with Google",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              child: ElevatedButton.icon(
+                onPressed: isGoogleLoading ? null : signInWithGoogle,
+                icon: Image.asset(
+                  'assets/icons/g.png', 
+                  height: 20,
+                  width: 20,
                 ),
-                elevation: 3,
-                shadowColor: Colors.black45,
+                label: isGoogleLoading
+                    ? const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                        ),
+                      )
+                    : const Text(
+                        "Continue with Google",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             
-            // Register Link
+            // Sign up link
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -464,8 +493,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   child: const Text(
                     "Sign Up",
                     style: TextStyle(
-                      color: Color(0xFF00695C),
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF667eea),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -484,99 +513,45 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     bool isPassword = false,
     String? Function(String?)? validator,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF424242),
-          ),
+    return TextFormField(
+      controller: controller,
+      obscureText: isPassword ? _obscurePassword : false,
+      validator: validator,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: const Color(0xFF667eea)),
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey.shade600,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+              )
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: isPassword ? _obscurePassword : false,
-          validator: validator,
-          decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: const Color(0xFF00695C)),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                      color: Colors.grey.shade600,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF00695C), width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
-            ),
-            filled: true,
-            fillColor: Colors.grey.shade50,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.grey.shade300),
         ),
-      ],
-    );
-  }
-
-  Widget _buildFooterInfo() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Color(0xFF667eea), width: 2),
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            Icons.security,
-            color: Colors.white.withOpacity(0.8),
-            size: 32,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            "Secure Login",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "Your credentials are encrypted and secure",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        filled: true,
+        fillColor: Colors.grey.shade50,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }
