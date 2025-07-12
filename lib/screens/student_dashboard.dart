@@ -20,14 +20,21 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
   bool isLoading = true;
   
   late AnimationController _animationController;
+  late AnimationController _buttonAnimationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    
+    _buttonAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
       vsync: this,
     );
     
@@ -44,7 +51,15 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutCubic,
+      curve: Curves.easeOutBack,
+    ));
+    
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack,
     ));
     
     fetchStudentInfo();
@@ -53,6 +68,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
   @override
   void dispose() {
     _animationController.dispose();
+    _buttonAnimationController.dispose();
     super.dispose();
   }
 
@@ -81,10 +97,80 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
           ),
           backgroundColor: Colors.red.shade600,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
         ),
       );
     }
+  }
+
+  void _signOut() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Sign Out"),
+        content: const Text("Are you sure you want to sign out?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text("Sign Out"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedButton({
+    required VoidCallback onPressed,
+    required Widget child,
+    Color? backgroundColor,
+    bool isSmall = false,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedScale(
+            scale: 1.0,
+            duration: const Duration(milliseconds: 150),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmall ? 12 : 16,
+                vertical: isSmall ? 10 : 12,
+              ),
+              decoration: BoxDecoration(
+                color: backgroundColor ?? const Color(0xFF667eea),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: (backgroundColor ?? const Color(0xFF667eea)).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -94,8 +180,9 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF00695C),
-              Color(0xFF004D40),
+              Color(0xFF667eea),
+              Color(0xFF764ba2),
+              Color(0xFF6B73FF),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -106,27 +193,35 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
               ? _buildLoadingState()
               : RefreshIndicator(
                   onRefresh: fetchStudentInfo,
-                  color: const Color(0xFF00695C),
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildHeader(),
-                              const SizedBox(height: 30),
-                              _buildUserInfoCard(),
-                              const SizedBox(height: 20),
-                              _buildProjectCard(),
-                              const SizedBox(height: 20),
-                              _buildQuickActionsCard(),
-                            ],
-                          ),
+                  color: const Color(0xFF667eea),
+                  backgroundColor: Colors.white,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: _buildHeader(),
+                            ),
+                            SliverPadding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              sliver: SliverToBoxAdapter(
+                                child: Column(
+                                  children: [
+                                    _buildUserInfoCard(),
+                                    const SizedBox(height: 20),
+                                    _buildProjectCard(),
+                                    const SizedBox(height: 20),
+                                    _buildQuickActionsCard(),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -143,7 +238,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            color: Colors.white,
             strokeWidth: 3,
           ),
           SizedBox(height: 16),
@@ -160,80 +255,80 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
   }
 
   Widget _buildHeader() {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.dashboard,
-            color: Colors.white,
-            size: 28,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Student Dashboard",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              // Dashboard title with icon
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.1),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.dashboard_rounded,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Colors.white, Color(0xFFE8EAF6)],
+                        ).createShader(bounds),
+                        child: const Text(
+                          "Student Dashboard",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        "Manage your project efficiently",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.8),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              Text(
-                "Manage your project efficiently",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.8),
+              // Sign out button
+              _buildAnimatedButton(
+                onPressed: _signOut,
+                backgroundColor: Colors.red.shade600,
+                isSmall: true,
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Colors.white,
+                  size: 18,
                 ),
               ),
             ],
           ),
-        ),
-        IconButton(
-          onPressed: () {
-            
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("Logout"),
-                content: const Text("Are you sure you want to logout?"),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushReplacementNamed(context, '/login');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text("Logout"),
-                  ),
-                ],
-              ),
-            );
-          },
-          icon: const Icon(Icons.logout, color: Colors.white),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.white.withOpacity(0.1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -243,12 +338,12 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -260,12 +355,14 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00695C).withOpacity(0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.person,
-                  color: Color(0xFF00695C),
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
@@ -287,7 +384,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF424242),
+                        color: Color(0xFF2D3748),
                       ),
                     ),
                   ],
@@ -297,35 +394,46 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: const Color(0xFFF7FAFC),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.badge,
-                  color: Color(0xFF00695C),
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  "Registration Number:",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.badge,
+                    color: Colors.blue.shade700,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  registrationNumber,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF424242),
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Registration Number",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF718096),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      registrationNumber,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3748),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -341,12 +449,12 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -358,12 +466,14 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00695C).withOpacity(0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.assignment,
-                  color: Color(0xFF00695C),
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
@@ -374,7 +484,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF424242),
+                    color: Color(0xFF2D3748),
                   ),
                 ),
               ),
@@ -404,7 +514,6 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         _buildProjectDetailRow("Submitted At", project!.submittedAt, Icons.calendar_today),
         const SizedBox(height: 16),
         
-        
         Row(
           children: [
             const Icon(Icons.info_outline, size: 20, color: Colors.grey),
@@ -424,11 +533,10 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         
         const SizedBox(height: 20),
         
-        
         if (project!.status.toLowerCase() == 'approved')
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: _buildAnimatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -440,16 +548,14 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
                   ),
                 );
               },
-              icon: const Icon(Icons.upload_file, size: 20),
-              label: const Text("Upload Proposal"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF26A69A),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
+              backgroundColor: Colors.green.shade600,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_file, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
+                  Text("Upload Proposal", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ],
               ),
             ),
           ),
@@ -504,7 +610,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF424242),
+              color: Color(0xFF2D3748),
             ),
           ),
         ),
@@ -569,9 +675,9 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: const Color(0xFFF7FAFC),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: Column(
             children: [
@@ -611,12 +717,12 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -628,12 +734,14 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00695C).withOpacity(0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.flash_on,
-                  color: Color(0xFF00695C),
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
@@ -643,7 +751,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF424242),
+                  color: Color(0xFF2D3748),
                 ),
               ),
             ],
@@ -653,7 +761,7 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
           
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton.icon(
+            child: _buildAnimatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -662,16 +770,17 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
                   ),
                 ).then((_) => fetchStudentInfo());
               },
-              icon: const Icon(Icons.add_circle_outline, size: 20),
-              label: Text(project != null ? "Submit New Topic" : "Submit Topic"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00695C),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
+              backgroundColor: const Color(0xFF667eea),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    project != null ? "Submit New Topic" : "Submit Topic",
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ],
               ),
             ),
           ),
@@ -680,19 +789,18 @@ class _StudentDashboardState extends State<StudentDashboard> with TickerProvider
           
           SizedBox(
             width: double.infinity,
-            child: OutlinedButton.icon(
+            child: _buildAnimatedButton(
               onPressed: () {
                 fetchStudentInfo();
               },
-              icon: const Icon(Icons.refresh, size: 20),
-              label: const Text("Refresh Dashboard"),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF00695C),
-                side: const BorderSide(color: Color(0xFF00695C)),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+              backgroundColor: Colors.grey.shade600,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.refresh, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
+                  Text("Refresh Dashboard", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                ],
               ),
             ),
           ),
