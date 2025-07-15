@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = "https://spms-ri0v.onrender.com";
 
   static Future<Map<String, dynamic>> register({
     required String username,
