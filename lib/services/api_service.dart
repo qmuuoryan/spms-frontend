@@ -17,7 +17,7 @@ class ApiService {
     required String password,
     required String role,
   }) async {
-    final url = Uri.parse('$baseUrl/auth/register/');
+    final url = Uri.parse('$baseUrl/register/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'username': username,
