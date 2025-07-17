@@ -42,7 +42,7 @@ class ApiService {
 
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/api/login/');
+    final url = Uri.parse('$baseUrl/login/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'username': email, 'password': password});
 
