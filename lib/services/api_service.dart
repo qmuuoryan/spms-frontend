@@ -61,7 +61,7 @@ class ApiService {
   }
 
   static Future<StudentDashboardData> getStudentDashboard(String token) async {
-    final url = Uri.parse('$baseUrl/api/dashboard/student/');
+    final url = Uri.parse('$baseUrl/dashboard/student/');
     final response = await http.get(
       url,
       headers: {
@@ -82,7 +82,7 @@ class ApiService {
   }
   
   static Future<void> submitProjectTopic(String token, String title, String description) async {
-    final url = Uri.parse('$baseUrl/api/dashboard/student/submit-topic/');
+    final url = Uri.parse('$baseUrl/dashboard/student/submit-topic/');
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Token $token',
@@ -109,7 +109,7 @@ class ApiService {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/api/projects/$projectId/proposals'),
+        Uri.parse('$baseUrl/projects/$projectId/proposals'),
       );
 
       
@@ -152,7 +152,7 @@ class ApiService {
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('$baseUrl/api/projects/$projectId/proposals'),
+        Uri.parse('$baseUrl/projects/$projectId/proposals'),
       );
 
       
@@ -187,7 +187,7 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> getSubmittedTopics(String token) async {
-    final url = Uri.parse('$baseUrl/api/lecturer/submitted-topics/');
+    final url = Uri.parse('$baseUrl/lecturer/submitted-topics/');
     final response = await http.get(url, headers: {
       'Authorization': 'Token $token',
       'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ class ApiService {
   }
 
   static Future<void> approveTopic(String token, int projectId) async {
-    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/approve/');
+    final url = Uri.parse('$baseUrl/lecturer/topic/$projectId/approve/');
     final response = await http.post(url, headers: {
       'Authorization': 'Token $token',
     });
@@ -213,7 +213,7 @@ class ApiService {
   }
 
   static Future<void> rejectTopic(String token, int projectId) async {
-    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/reject/');
+    final url = Uri.parse('$baseUrl/lecturer/topic/$projectId/reject/');
     final response = await http.post(url, headers: {
       'Authorization': 'Token $token',
     });
@@ -224,7 +224,7 @@ class ApiService {
   }
 
   static Future<void> assignSupervisor(String token, int projectId, int supervisorId) async {
-    final url = Uri.parse('$baseUrl/api/lecturer/topic/$projectId/assign-supervisor/');
+    final url = Uri.parse('$baseUrl/lecturer/topic/$projectId/assign-supervisor/');
     final response = await http.post(
      url,
       headers: {
@@ -241,7 +241,7 @@ class ApiService {
   }
 
   static Future<List<Map<String, dynamic>>> getSupervisors(String token) async {
-    final url = Uri.parse('$baseUrl/api/lecturer/supervisors/');
+    final url = Uri.parse('$baseUrl/lecturer/supervisors/');
     final response = await http.get(url, headers: {
       'Authorization': 'Token $token',
       'Content-Type': 'application/json',
@@ -256,7 +256,7 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getAssignedProjects(String token) async {
-    final url = Uri.parse('$baseUrl/api/supervisor/assigned-projects/');
+    final url = Uri.parse('$baseUrl/supervisor/assigned-projects/');
     final response = await http.get(url, headers: {
       'Authorization': 'Token $token',
       'Content-Type': 'application/json',
@@ -275,7 +275,7 @@ class ApiService {
     required int proposalId,
     required String action,
   }) async {
-    final url = Uri.parse('$baseUrl/api/supervisor/proposal/$proposalId/$action/');
+    final url = Uri.parse('$baseUrl/supervisor/proposal/$proposalId/$action/');
     final response = await http.post(url, headers: {
       'Authorization': 'Token $token',
     });
@@ -288,7 +288,7 @@ class ApiService {
 
 
   static Future<void> approveProposal(String token, int proposalId, String feedback) async {
-    final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/approve/');
+    final url = Uri.parse('$baseUrl/supervisor/proposals/$proposalId/approve/');
     final response = await http.post(
      url,
       headers: {
@@ -305,7 +305,7 @@ class ApiService {
   }
 
   static Future<void> rejectProposal(String token, int proposalId, String feedback) async {
-    final url = Uri.parse('$baseUrl/api/supervisor/proposals/$proposalId/reject/');
+    final url = Uri.parse('$baseUrl/supervisor/proposals/$proposalId/reject/');
     final response = await http.post(
       url,
       headers: {
@@ -324,7 +324,7 @@ class ApiService {
 
   static Future<List<Map<String, dynamic>>> getProposalsForProject(
       String token, int projectId) async {
-    final url = Uri.parse('$baseUrl/api/projects/$projectId/proposals/');
+    final url = Uri.parse('$baseUrl/projects/$projectId/proposals/');
     final response = await http.get(url, headers: {
       'Authorization': 'Token $token',
       'Content-Type': 'application/json',
