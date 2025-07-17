@@ -9,7 +9,7 @@ import 'dart:io';
 import 'package:path/path.dart';
 
 class ApiService {
-  static const String baseUrl = "https://spms-ri0v.onrender.com/api/";
+  static const String baseUrl = "https://spms-ri0v.onrender.com/api";
 
   static Future<Map<String, dynamic>> register({
     required String username,
@@ -17,7 +17,7 @@ class ApiService {
     required String password,
     required String role,
   }) async {
-    final url = Uri.parse('$baseUrl/api/register/');
+    final url = Uri.parse('$baseUrl /auth/register/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'username': username,
