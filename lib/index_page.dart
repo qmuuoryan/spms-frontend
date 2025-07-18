@@ -816,7 +816,7 @@ class _IndexPageState extends State<IndexPage> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 20),
           Text(
-            '© 2025 SPMS. All rights reserved.',
+            '© 2025 SPMS. All rights reserved. https://github.com/qmuuoryan',
             style: TextStyle(
               fontSize: 14,
               color: Colors.white.withOpacity(0.7),
